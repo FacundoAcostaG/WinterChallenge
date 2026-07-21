@@ -29,6 +29,22 @@ npm install
 npm run test:api
 ```
 
+## Correr todos los tests
+
+El script `run-tests.sh` corre las tres suites (API, Performance y E2E) e instala lo que haga falta (`npm install`, venv de e2e, navegador de Playwright):
+
+```bash
+./run-tests.sh
+```
+
+También se puede correr cada suite por separado:
+
+```bash
+./run-tests.sh api
+./run-tests.sh performance
+./run-tests.sh e2e
+```
+
 ## Performance con k6
 
 La parte de performance está concentrada en un solo archivo:
@@ -41,7 +57,11 @@ Para ejecutarla:
 npm run test:performance
 ```
 
-Requiere tener `k6` instalado en la máquina.
+Requiere tener `k6` instalado en la máquina:
+
+```bash
+brew install k6
+```
 
 ## E2E con Behave + Playwright
 
@@ -65,7 +85,8 @@ python -m playwright install chromium
 Ejecución:
 
 ```bash
-behave e2e/features/amazon_winter_cart.feature
+cd e2e
+behave 
 ```
 
 ## Organización actual
