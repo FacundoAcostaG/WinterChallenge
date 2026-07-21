@@ -1,4 +1,7 @@
 # Winter Challenge
+## Integrantes
+- Facundo Acosta
+- Pedro Scheeffer
 
 Base inicial para resolver el challenge con foco en pruebas de API usando Playwright + TypeScript.
 
@@ -78,7 +81,10 @@ Con separación en:
 Instalación:
 
 ```bash
-pip install -r e2e/requirements.txt
+cd e2e
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 python -m playwright install chromium
 ```
 
@@ -86,6 +92,7 @@ Ejecución:
 
 ```bash
 cd e2e
+source .venv/bin/activate
 behave 
 ```
 

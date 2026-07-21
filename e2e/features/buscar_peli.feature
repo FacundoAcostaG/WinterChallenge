@@ -19,10 +19,6 @@ Feature: Búsqueda de películas invernales
     Quiero buscar una película y validar su información
     Para asegurarme de elegir una buena película
 
-    # TODO: completar/ajustar los pasos según el sitio elegido (IMDb o TMDB)
-    # y la implementación real en steps/buscar_peli_steps.py
-
-    @bonus
     Scenario: Buscar "Ice Age" y validar director y calificación
         Given que el usuario está en la página principal
         When busca la película "Ice Age"
