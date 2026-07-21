@@ -5,3 +5,5 @@ api/test-results/
 e2e/artifacts/
 __pycache__/
 *.pyc
+
+traces/
