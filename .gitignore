@@ -1,0 +1,7 @@
+node_modules/
+test-results/
+api/test-results/
+.env
+e2e/artifacts/
+__pycache__/
+*.pyc

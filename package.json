@@ -1,0 +1,14 @@
+{
+  "name": "winter-challenge",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test:api": "playwright test -c api/playwright.config.ts",
+    "test:api:ui": "playwright test -c api/playwright.config.ts --ui",
+    "test:performance": "k6 run performance/winter-challenge.k6.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.46.0",
+    "typescript": "^5.5.4"
+  }
+}
