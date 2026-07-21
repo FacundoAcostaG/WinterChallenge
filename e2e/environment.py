@@ -17,7 +17,7 @@
 
 import os
 
-from pages.search_page import SearchPage
+from pages.home_page import HomePage
 
 from dotenv import load_dotenv
 from playwright.sync_api import sync_playwright
@@ -43,7 +43,7 @@ def before_scenario(context, scenario):
     context.browser_context.tracing.start(screenshots=True, snapshots=True, sources=True)
     context.page = context.browser_context.new_page()
     # TODO: instanciar acá los Page Objects que se usen en los steps
-    context.search_page = SearchPage(context.page)
+    context.home_page = HomePage(context.page)
 
 
 

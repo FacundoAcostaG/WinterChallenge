@@ -40,15 +40,17 @@ Tecnologías sugeridas:
       buscar_peli.feature          -> escenario Gherkin (Given/When/Then)
       environment.py                -> hooks de behave (setup/teardown de Playwright)
       steps/
-        buscar_peli_steps.py        -> implementación de los steps (conecta Gherkin <-> Page Objects)
+        home_steps.py                -> steps de la página principal (visitar, buscar)
+        results_steps.py             -> steps de los resultados (seleccionar película)
+        movie_steps.py               -> steps de la ficha de película (director, calificación, captura)
       pages/
-        base_page.py                -> comportamiento común a todas las páginas
-        search_page.py               -> home + buscador
+        home_page.py                 -> home + buscador
+        results_page.py               -> resultados de la búsqueda, selección de película
         movie_page.py                -> ficha de película (director, calificación)
 
 Lo que falta implementar (marcado con TODO / NotImplementedError):
     ○ Locators reales de IMDb o TMDB
-    ○ Lógica de búsqueda y navegación en SearchPage
+    ○ Lógica de búsqueda y navegación en HomePage/ResultsPage
     ○ Lectura de director/calificación en MoviePage
     ○ Conexión de esa lógica en los steps
 
