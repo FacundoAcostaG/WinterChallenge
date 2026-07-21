@@ -1,75 +1,63 @@
-import os
-import re
-import sys
-from pathlib import Path
+# ============================================
+# CHEATSHEET BEHAVE - environment.py (hooks)
+# ============================================
+# Orden de ejecución de los hooks de Behave:
+#   before_all(context)                -> una vez, antes de toda la corrida
+#     before_feature(context, feature)     -> antes de cada .feature
+#       before_scenario(context, scenario)     -> antes de cada Scenario
+#         before_step(context, step)               -> antes de cada step (opcional)
+#         after_step(context, step)                -> después de cada step (opcional)
+#       after_scenario(context, scenario)       -> después de cada Scenario
+#     after_feature(context, feature)      -> después de cada .feature
+#   after_all(context)                 -> una vez, al final de toda la corrida
+#
+# `context` viaja entre hooks y steps: todo lo que se cuelga acá
+# (context.browser, context.page, etc.) queda disponible en los steps.
+# ============================================
 
+import os
+
+from pages.search_page import SearchPage
+
+from dotenv import load_dotenv
 from playwright.sync_api import sync_playwright
 
+load_dotenv()
 
-E2E_DIR = Path(__file__).resolve().parent
-if str(E2E_DIR) not in sys.path:
-    sys.path.insert(0, str(E2E_DIR))
-
-ARTIFACTS_DIR = E2E_DIR / "artifacts"
-VIDEOS_DIR = ARTIFACTS_DIR / "videos"
-SCREENSHOTS_DIR = ARTIFACTS_DIR / "screenshots"
-TRACES_DIR = ARTIFACTS_DIR / "traces"
-
-
-def _as_bool(value: str | None, default: bool) -> bool:
-    if value is None:
-        return default
-
-    return value.strip().lower() in {"1", "true", "yes", "y", "on"}
-
-
-def _slugify(value: str) -> str:
-    return re.sub(r"[^a-zA-Z0-9_-]+", "-", value).strip("-").lower()
+# HEADLESS=false behave         -> corre con navegador visible
+# PWDEBUG=1 behave              -> abre el Playwright Inspector (fuerza headed igual)
+# SLOW_MO=0 behave              -> desactiva la espera entre acciones
+HEADLESS = os.getenv("HEADLESS", "true").lower() != "false"
+SLOW_MO = int(os.getenv("SLOW_MO", "500"))  # ms de espera entre cada acción de Playwright
 
 
 def before_all(context):
-    for directory in (VIDEOS_DIR, SCREENSHOTS_DIR, TRACES_DIR):
-        directory.mkdir(parents=True, exist_ok=True)
-
-    headless = _as_bool(os.getenv("PW_HEADLESS"), default=False)
-    slow_mo = int(os.getenv("PW_SLOW_MO", "500"))
-
-    context.playwright_manager = sync_playwright().start()
-    context.browser = context.playwright_manager.chromium.launch(
-        headless=headless,
-        slow_mo=slow_mo,
+    context.playwright = sync_playwright().start()
+    context.browser = context.playwright.chromium.launch(
+        headless=HEADLESS, slow_mo=SLOW_MO
     )
 
 
 def before_scenario(context, scenario):
-    context.scenario_slug = _slugify(scenario.name)
-    context.browser_context = context.browser.new_context(
-        record_video_dir=str(VIDEOS_DIR),
-        record_video_size={"width": 1440, "height": 900},
-    )
+    context.browser_context = context.browser.new_context(locale="en-US")
     context.browser_context.tracing.start(screenshots=True, snapshots=True, sources=True)
     context.page = context.browser_context.new_page()
-    context.page.set_default_timeout(15000)
-    context.selected_products = []
+    # TODO: instanciar acá los Page Objects que se usen en los steps
+    context.search_page = SearchPage(context.page)
+
+
 
 
 def after_scenario(context, scenario):
-    failed = str(scenario.status).lower() == "failed"
-
-    if failed:
-        context.page.screenshot(
-            path=str(SCREENSHOTS_DIR / f"{context.scenario_slug}.png"),
-            full_page=True,
-        )
-        context.browser_context.tracing.stop(
-            path=str(TRACES_DIR / f"{context.scenario_slug}.zip")
-        )
+    if scenario.status == "failed":
+        context.browser_context.tracing.stop(path=f"traces/{scenario.name}.zip")
     else:
-        context.browser_context.tracing.stop()
+        context.browser_context.tracing.stop(path=f"traces/{scenario.name}.zip")  # descarta el trace si pasó
+        context.browser_context.close()
 
-    context.browser_context.close()
+
 
 
 def after_all(context):
     context.browser.close()
-    context.playwright_manager.stop()
+    context.playwright.stop()
